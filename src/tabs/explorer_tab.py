@@ -13,7 +13,7 @@ def render_explorer_tab(asset_cols, price_df, returns_df) -> None:
 
     st.plotly_chart(
         plot_historical_stock(price_df, selected_ticker),
-        use_container_width=True
+        width="stretch"
     )
 
     stock_returns = returns_df[selected_ticker]

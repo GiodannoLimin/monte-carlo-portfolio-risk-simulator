@@ -1,99 +1,153 @@
 LEARN_CONTENT = [
     {
-        "title": "What do portfolio weights mean?",
+        "title": "1. What does this simulator do?",
         "body": """
-Portfolio weight is how much of your portfolio is allocated to each stock.
+This app explores **possible future outcomes** for a portfolio of stocks or ETFs.
+
+Instead of giving one fixed prediction, it simulates **many possible future scenarios**
+based on historical return patterns.
+
+This helps you understand:
+
+- how a portfolio might grow or decline
+- the range of possible outcomes
+- downside risk and upside potential
+- how results change across different investment horizons
+        """
+    },
+    {
+        "title": "2. What is Monte Carlo simulation?",
+        "body": """
+Monte Carlo simulation is a method for modeling **uncertainty**.
+
+Rather than assuming there is only one future path, the app generates many random
+possible paths for the portfolio.
+
+For example, if the app runs 8,000 simulations, it creates 8,000 different
+possible market scenarios.
+
+By studying all of them together, we can estimate typical, bad, and good outcomes.
+        """
+    },
+    {
+        "title": "3. What do portfolio weights mean?",
+        "body": """
+Portfolio weight is how much of your portfolio is allocated to each asset.
 
 Example:
 - 40% AAPL
 - 30% MSFT
 - 20% NVDA
 - 10% SPY
-        """
-    },
-    {
-        "title": "What are the many lines in the simulation chart?",
-        "body": """
-Each line represents one possible future path for the portfolio.
 
-Because the future is uncertain, the model simulates many possible scenarios
-instead of showing only one outcome.
+If one asset has a larger weight, it has a larger influence on the portfolio result.
+
+In this app, raw weights are normalized automatically so they always sum to 100%.
         """
     },
     {
-        "title": "What is VaR?",
+        "title": "4. Why are there many lines in the simulation chart?",
         "body": """
-VaR (Value at Risk) is a downside threshold from the simulated return distribution.
+Each line represents **one possible future path** for the portfolio.
+
+Some paths may rise steadily.
+Some may fluctuate.
+Some may decline.
+
+The chart is not trying to show the exact future.
+It is showing the **range of plausible outcomes** under the model.
+        """
+    },
+    {
+        "title": "5. What are Expected Return and Volatility?",
+        "body": """
+**Expected Return** is the average simulated portfolio return over the selected horizon.
+
+**Volatility** measures how much portfolio returns tend to fluctuate.
+
+In simple terms:
+- higher expected return means higher average growth
+- higher volatility means more uncertainty and larger swings
+        """
+    },
+    {
+        "title": "6. What is VaR?",
+        "body": """
+VaR stands for **Value at Risk**.
+
+It is a downside threshold from the simulated return distribution.
 
 Example:
 if VaR = -1.5% at 95% confidence, then about 5% of simulated outcomes
 are worse than -1.5%.
-        """
-    },
-    {
-        "title": "What is CVaR?",
-        "body": """
-CVaR (Conditional Value at Risk) is the average loss in the worst cases
-beyond the VaR cutoff.
 
-It helps show how severe the bad outcomes are on average.
+VaR helps summarize downside risk in one number.
         """
     },
     {
-        "title": "Why are portfolio risk and investment outcomes separated?",
+        "title": "7. What is CVaR?",
+        "body": """
+CVaR stands for **Conditional Value at Risk**.
+
+While VaR gives a cutoff point, CVaR looks at what happens **beyond** that cutoff.
+
+It measures the **average loss in the worst tail of outcomes**.
+
+So:
+- VaR tells you where the bad tail begins
+- CVaR tells you how bad the worst cases are on average
+        """
+    },
+    {
+        "title": "8. Why are portfolio risk and investment outcomes separated?",
         "body": """
 Because they answer different questions.
 
-- **Portfolio risk simulation** asks how the modeled portfolio behaves.
-- **Investment outcome projection** asks what your own money could become if those simulated returns are applied to it.
+- **Portfolio Risk Simulation** studies how the modeled portfolio behaves in percentage terms.
+- **Investment Outcome Projection** applies those simulated returns to your own money settings.
 
-Separating them makes the dashboard easier to understand.
+This separation makes the dashboard easier to interpret.
+
+A portfolio can have a certain return distribution, while your own final dollar outcome
+also depends on:
+- your initial investment
+- your monthly contributions
+- your chosen investment horizon
         """
     },
     {
-        "title": "Is this live prediction?",
+        "title": "9. Why does the simulator use 252 days per year?",
         "body": """
-Not exactly.
+Financial models usually use **trading days**, not calendar days.
 
-This app downloads recent historical market data and uses it to simulate
-possible future scenarios.
+Markets are open about **252 trading days per year** after excluding weekends
+and holidays.
 
-So it is better understood as scenario analysis, not a guaranteed prediction.
-        """
-    },
-    {
-        "title": "Why does the simulator use 252 days per year?",
-        "body": """
-Financial models usually measure time using **trading days instead of calendar days**.
+Because this simulator works with **daily returns**, the time horizon must also
+be measured in trading days.
 
-Stock markets are open about **252 days per year**, after removing weekends and holidays.
-
-Because this simulator models **daily returns**, the investment horizon must be converted
-from years into trading days.
-
-Example:
-
+Examples:
 - 0.5 years ≈ 126 trading days
 - 1 year ≈ 252 trading days
 - 2 years ≈ 504 trading days
 - 3 years ≈ 756 trading days
+        """
+    },
+    {
+        "title": "10. Is this predicting the future?",
+        "body": """
+No.
 
-Using trading days ensures the simulation is consistent with the **historical return data**
-used to estimate volatility and expected returns.
+This tool is better understood as **scenario analysis**, not guaranteed prediction.
+
+It uses historical data and mathematical assumptions to explore what *could* happen,
+not what *will* happen.
+
+Real markets can behave differently because of:
+- economic shocks
+- policy changes
+- company news
+- changing market regimes
         """
     },
 ]
-
-DISCLAIMER_TEXT = """
-This tool simulates possible outcomes based on historical data and mathematical assumptions.
-
-It is **not professional financial advice** and does **not guarantee future performance**.
-
-Important assumptions:
-- historical drift and volatility are informative
-- prices follow Geometric Brownian Motion
-- volatility is treated as approximately constant
-- real market shocks and regime changes may not be captured
-
-Use this project for **education and exploration**, not as a sole basis for real investment decisions.
-"""
