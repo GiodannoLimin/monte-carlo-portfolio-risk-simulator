@@ -151,3 +151,17 @@ Real markets can behave differently because of:
         """
     },
 ]
+
+DISCLAIMER_TEXT = """
+This tool simulates possible outcomes based on historical data and mathematical assumptions.
+
+It is **not professional financial advice** and does **not guarantee future performance**.
+
+Important assumptions:
+- historical drift and volatility are informative
+- prices follow Geometric Brownian Motion
+- volatility is treated as approximately constant
+- real market shocks and regime changes may not be captured
+
+Use this project for **education and exploration**, not as a sole basis for real investment decisions.
+"""
