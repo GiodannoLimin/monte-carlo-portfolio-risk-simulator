@@ -1,6 +1,6 @@
-import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 
 def plot_historical_stock(price_df: pd.DataFrame, ticker: str):
@@ -11,12 +11,13 @@ def plot_historical_stock(price_df: pd.DataFrame, ticker: str):
             x=price_df["Date"],
             y=price_df[ticker],
             mode="lines",
-            name=ticker
+            name=ticker,
+            line=dict(width=2),
         )
     )
 
     fig.update_layout(
-        title=f"Historical Closing Prices: {ticker}",
+        title=f"Historical Price Chart: {ticker}",
         xaxis_title="Date",
         yaxis_title="Price",
         template="plotly_dark",
@@ -26,7 +27,7 @@ def plot_historical_stock(price_df: pd.DataFrame, ticker: str):
     return fig
 
 
-def plot_simulated_portfolio_paths(portfolio_values: np.ndarray, max_lines: int = 25):
+def plot_simulated_portfolio_paths(portfolio_values, max_lines: int = 20):
     fig = go.Figure()
 
     n_sims = portfolio_values.shape[1]
@@ -38,7 +39,7 @@ def plot_simulated_portfolio_paths(portfolio_values: np.ndarray, max_lines: int 
                 y=portfolio_values[:, i],
                 mode="lines",
                 line=dict(width=1),
-                opacity=0.45,
+                opacity=0.40,
                 showlegend=False
             )
         )
@@ -48,20 +49,19 @@ def plot_simulated_portfolio_paths(portfolio_values: np.ndarray, max_lines: int 
         xaxis_title="Days",
         yaxis_title="Portfolio Value",
         template="plotly_dark",
-        height=360,
+        height=340,
         margin=dict(l=30, r=30, t=60, b=30),
     )
     return fig
 
 
-def plot_return_distribution(returns: np.ndarray, var: float, cvar: float):
+def plot_return_distribution(returns, var: float, cvar: float):
     fig = go.Figure()
 
     fig.add_trace(
         go.Histogram(
             x=returns,
             nbinsx=50,
-            name="Portfolio Returns",
             opacity=0.85
         )
     )
@@ -86,13 +86,13 @@ def plot_return_distribution(returns: np.ndarray, var: float, cvar: float):
         xaxis_title="Return",
         yaxis_title="Frequency",
         template="plotly_dark",
-        height=360,
+        height=340,
         margin=dict(l=30, r=30, t=60, b=30),
     )
     return fig
 
 
-def plot_terminal_value_distribution(final_values: np.ndarray):
+def plot_terminal_value_distribution(final_values):
     fig = go.Figure()
 
     fig.add_trace(
@@ -108,29 +108,49 @@ def plot_terminal_value_distribution(final_values: np.ndarray):
         xaxis_title="Final Portfolio Value",
         yaxis_title="Frequency",
         template="plotly_dark",
-        height=360,
+        height=340,
         margin=dict(l=30, r=30, t=60, b=30),
     )
     return fig
+import plotly.graph_objects as go
 
 
-def plot_projection_table_bars(projection_df: pd.DataFrame):
+def plot_projection_table_bars(df):
     fig = go.Figure()
 
     fig.add_trace(
         go.Bar(
-            x=projection_df["Horizon"],
-            y=projection_df["Median Final Value"],
-            name="Median Final Value"
+            x=df["Horizon"],
+            y=df["Median Profit/Loss"],
+            name="Median Profit/Loss",
+            text=[f"${v:,.0f}" for v in df["Median Profit/Loss"]],
+            textposition="outside",
+        )
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=df["Horizon"],
+            y=df["5th Percentile Profit/Loss"],
+            mode="lines+markers",
+            name="5th Percentile",
+        )
+    )
+
+    fig.add_trace(
+        go.Scatter(
+            x=df["Horizon"],
+            y=df["95th Percentile Profit/Loss"],
+            mode="lines+markers",
+            name="95th Percentile",
         )
     )
 
     fig.update_layout(
-        title="Median Final Value by Horizon",
-        xaxis_title="Horizon",
-        yaxis_title="Value",
         template="plotly_dark",
-        height=340,
-        margin=dict(l=30, r=30, t=60, b=30),
+        xaxis_title="Investment Horizon",
+        yaxis_title="Profit / Loss ($)",
+        legend_title="Scenario",
     )
+
     return fig

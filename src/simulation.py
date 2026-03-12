@@ -49,19 +49,12 @@ def simulate_portfolio_growth(
     portfolio_returns: np.ndarray,
     years: float
 ):
-    """
-    Uses the simulated final portfolio returns over the full chosen horizon.
-    We apply the same total simulated return to the initial investment and
-    approximate recurring contributions as being invested evenly through time.
-    """
-
     years = float(years)
     n_months = int(round(years * 12))
 
     initial_future_values = initial_investment * (1 + portfolio_returns)
 
     if monthly_contribution > 0 and n_months > 0:
-        # Approximation: average contribution is invested for half the horizon.
         half_horizon_growth = np.power(1 + portfolio_returns, 0.5)
         contribution_future_values = monthly_contribution * n_months * half_horizon_growth
     else:

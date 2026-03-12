@@ -1,97 +1,235 @@
-THEORY_TEXT = r"""
-## Theory and Method
+THEORY_TEXT = """
+## Mathematical Theory
 
-### 1. Daily Returns
+This simulator combines **historical market data**, **Geometric Brownian Motion (GBM)**,
+and **Monte Carlo simulation** to explore possible portfolio outcomes.
 
-We compute daily simple returns using
+It answers two main questions:
 
-$$
-r_t = \frac{P_t - P_{t-1}}{P_{t-1}}
-$$
-
-where $P_t$ is the asset price at time $t$.
+1. How might the portfolio behave over the selected horizon?
+2. What could happen to a specific investment amount if those simulated returns occur?
 
 ---
 
-### 2. Parameter Estimation
+## 1. Historical Return Estimation
 
-For each asset, we estimate:
+The simulator downloads historical adjusted closing prices for the selected assets.
 
-- **drift ($\mu$)**: average historical return  
-- **volatility ($\sigma$)**: standard deviation of historical returns
-
-$$
-\mu = \text{mean}(r_t)
-$$
+From prices $P_t$, daily returns are computed as:
 
 $$
-\sigma = \text{std}(r_t)
+r_t = \\frac{P_t}{P_{t-1}} - 1
 $$
+
+Using these returns, the simulator estimates:
+
+- **drift ($\\mu$)** — average return  
+- **volatility ($\\sigma$)** — standard deviation of returns  
+
+These quantities are used as inputs for the simulation model.
 
 ---
 
-### 3. Geometric Brownian Motion
+## 2. Geometric Brownian Motion (GBM)
 
-The stock price follows the stochastic differential equation
+Each asset price is modeled using **Geometric Brownian Motion**.
+
+In continuous time:
 
 $$
-dS_t = \mu S_t dt + \sigma S_t dW_t
+dS_t = \\mu S_t dt + \\sigma S_t dW_t
 $$
 
-where
+where:
 
-- $S_t$ = asset price  
-- $\mu$ = drift  
-- $\sigma$ = volatility  
-- $W_t$ = Brownian motion  
+- $S_t$ = asset price at time $t$
+- $\\mu$ = drift parameter
+- $\\sigma$ = volatility parameter
+- $W_t$ = standard Brownian motion
+
+This model assumes that proportional price changes are random and that prices remain positive.
 
 ---
 
-### 4. Discrete Simulation Formula
+## 3. Discrete-Time Simulation Formula
 
-For Monte Carlo simulation we use
+Because the app simulates daily paths numerically, it uses the discrete-time GBM update:
 
 $$
-S_{t+1} = S_t \exp\left((\mu - \frac{1}{2}\sigma^2)\Delta t + \sigma\sqrt{\Delta t}Z\right)
+S_{t+1} =
+S_t \\exp\\left[
+(\\mu - \\frac{1}{2}\\sigma^2)\\Delta t
++ \\sigma \\sqrt{\\Delta t} Z_t
+\\right]
 $$
 
-where
+where:
 
-- $Z \sim N(0,1)$
-- $\Delta t$ is the time step
+- $\\Delta t$ is one trading-day step
+- $Z_t \\sim N(0,1)$ is a standard normal random variable
+
+This formula is applied repeatedly across the selected horizon to generate simulated price paths.
 
 ---
 
-### 5. Value at Risk (VaR)
+## 4. Monte Carlo Simulation
 
-At confidence level $\alpha$,
+Monte Carlo simulation generates **many random future scenarios** instead of one forecast.
 
-$$
-VaR_\alpha = \text{quantile}_{1-\alpha}(R)
-$$
+If the app runs $N$ simulations, it creates $N$ possible portfolio paths.
 
-This is a downside threshold from the simulated return distribution.
+These simulated paths allow us to estimate:
 
----
-
-### 6. Expected Shortfall (CVaR)
-
-$$
-CVaR = E[R \mid R \le VaR]
-$$
-
-This measures the average return in the worst tail of the distribution.
+- average outcomes
+- downside risk
+- upside potential
+- the distribution of possible returns
 
 ---
 
-### 7. Important Limitations
+## 5. Portfolio Construction
 
-This project is based on simplifying assumptions:
+Suppose the portfolio contains $k$ assets with weights
 
-- historical drift and volatility are informative
-- volatility is approximately constant
-- returns are driven by Gaussian shocks
-- market crashes and structural changes are not modeled directly
+$$
+w_1, w_2, \\dots, w_k
+$$
 
-So the output should be interpreted as a **scenario simulation**, not certainty.
+such that
+
+$$
+\\sum_{i=1}^{k} w_i = 1
+$$
+
+Portfolio return can be written as:
+
+$$
+R_p = \\sum_{i=1}^{k} w_i R_i
+$$
+
+where:
+
+- $R_p$ = portfolio return  
+- $R_i$ = return of asset $i$  
+- $w_i$ = portfolio weight of asset $i$
+
+This allows the simulator to combine simulated asset returns into a portfolio result.
+
+---
+
+## 6. Portfolio Risk Metrics
+
+After simulating many portfolio outcomes, the app summarizes the return distribution.
+
+### Expected Return
+
+The mean of simulated portfolio returns:
+
+$$
+E[R_p]
+$$
+
+### Volatility
+
+The standard deviation of returns:
+
+$$
+Vol(R_p) = \\sqrt{Var(R_p)}
+$$
+
+### Value at Risk (VaR)
+
+At confidence level $c$, VaR is the lower-tail cutoff of the simulated return distribution.
+
+For example, a **95% VaR** focuses on the worst $5\\%$ of outcomes.
+
+### Conditional Value at Risk (CVaR)
+
+CVaR is the **average loss beyond the VaR threshold**.
+
+It measures the expected loss in the worst tail of the distribution.
+
+---
+
+## 7. Investment Outcome Projection
+
+The portfolio simulation produces return scenarios in percentage terms.
+
+The app then applies those simulated returns to a user-defined investment plan:
+
+- initial investment
+- recurring monthly contribution
+- selected time horizon
+
+This produces a distribution of **possible final investment values**.
+
+From that distribution we compute:
+
+- median final value
+- mean final value
+- 5th percentile value
+- 95th percentile value
+- median profit/loss
+
+---
+
+## 8. Why 252 Trading Days?
+
+Financial models usually use **trading days** rather than calendar days.
+
+A year is approximated as:
+
+$$
+252 \\text{ trading days}
+$$
+
+So:
+
+- $0.5$ years $\\approx 126$ days
+- $1$ year $\\approx 252$ days
+- $2$ years $\\approx 504$ days
+- $3$ years $\\approx 756$ days
+
+This keeps the simulation consistent with the daily historical return data.
+
+---
+
+## 9. Model Assumptions
+
+This simulator relies on several simplifying assumptions:
+
+1. historical return patterns are informative about the future
+2. drift and volatility remain approximately stable
+3. asset prices follow GBM dynamics
+4. shocks are modeled using normally distributed randomness
+5. regime changes and macro events are not explicitly modeled
+
+These assumptions make the model useful for **learning and scenario analysis**, but they also limit realism.
+
+---
+
+## 10. Limitations
+
+Real markets may differ from this model because:
+
+- volatility changes over time
+- returns may not follow a normal distribution
+- extreme events occur more often than GBM suggests
+- asset correlations can shift
+- major news and structural breaks are not captured
+
+Therefore the simulator should be interpreted as **a model of possible scenarios**, not a guaranteed forecast.
+
+---
+
+## 11. Interpretation
+
+This app should be viewed as a tool for:
+
+- understanding uncertainty
+- exploring portfolio risk
+- comparing allocation choices
+- visualizing possible investment outcomes
+
+It is **not financial advice** and should not be used as the sole basis for investment decisions.
 """
