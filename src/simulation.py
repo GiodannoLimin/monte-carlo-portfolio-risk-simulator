@@ -5,11 +5,14 @@ import pandas as pd
 def estimate_parameters(returns_df: pd.DataFrame):
     asset_cols = [col for col in returns_df.columns if col != "Date"]
 
-    mu = returns_df[asset_cols].mean().values
-    sigma = returns_df[asset_cols].std().values
+    mu_daily = returns_df[asset_cols].mean().values
+    sigma_daily = returns_df[asset_cols].std().values
+
+    # convert daily parameters to annual
+    mu = mu_daily * 252
+    sigma = sigma_daily * np.sqrt(252)
 
     return mu, sigma, asset_cols
-
 
 def simulate_gbm_paths(
     initial_prices: np.ndarray,
