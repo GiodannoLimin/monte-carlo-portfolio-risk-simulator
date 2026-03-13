@@ -1,3 +1,5 @@
+import pandas as pd
+import plotly.express as px
 import streamlit as st
 
 from src.plotting import plot_projection_table_bars
@@ -14,6 +16,7 @@ def render_investment_section(
     selected_years,
     selected_total_contributions,
     investment_summary,
+    selected_final_values,
 ) -> None:
     st.subheader("Investment Outcome Projection")
     st.markdown(
@@ -90,3 +93,25 @@ The **median final investment value** is **${investment_summary['median_final_va
         plot_projection_table_bars(projection_df),
         width="stretch"
     )
+
+    st.markdown("")
+    st.markdown("### Distribution of Simulated Final Values")
+
+    final_values_df = pd.DataFrame({
+        "Final Value": selected_final_values
+    })
+
+    fig_final_values = px.histogram(
+        final_values_df,
+        x="Final Value",
+        nbins=40,
+        title=None,
+    )
+
+    fig_final_values.update_layout(
+        xaxis_title="Final Portfolio Value ($)",
+        yaxis_title="Frequency",
+        bargap=0.05,
+    )
+
+    st.plotly_chart(fig_final_values, width="stretch")

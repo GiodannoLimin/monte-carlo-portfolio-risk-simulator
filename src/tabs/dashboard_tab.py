@@ -24,6 +24,7 @@ def render_dashboard_tab(
     selected_years,
     selected_total_contributions,
     investment_summary,
+    selected_final_values,
 ) -> None:
     render_portfolio_overview(
         asset_cols=asset_cols,
@@ -64,4 +65,5 @@ def render_dashboard_tab(
         selected_years=selected_years,
         selected_total_contributions=selected_total_contributions,
         investment_summary=investment_summary,
+        selected_final_values=selected_final_values,
     )

@@ -125,6 +125,7 @@ with tab_dashboard:
         selected_years=selected_years,
         selected_total_contributions=selected_total_contributions,
         investment_summary=investment_summary,
+        selected_final_values=selected_final_values,
     )
 
 with tab_explorer:
