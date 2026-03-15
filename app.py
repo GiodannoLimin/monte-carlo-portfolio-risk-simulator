@@ -55,10 +55,30 @@ except Exception as e:
     st.error(f"Could not download data: {e}")
     st.stop()
 
+# NEW: guard against empty downloaded data
+if price_df.empty:
+    st.error("No data returned for the selected tickers or time period. Please try again.")
+    st.stop()
+
 returns_df = compute_returns(price_df)
 save_processed_data(price_df, returns_df)
 
 mu, sigma, asset_cols = estimate_parameters(returns_df)
+
+# NEW: guard against missing/empty asset columns before using iloc[-1]
+if len(asset_cols) == 0:
+    st.error("No valid asset columns were found in the downloaded data.")
+    st.stop()
+
+missing_cols = [col for col in asset_cols if col not in price_df.columns]
+if missing_cols:
+    st.error(f"Downloaded data is missing expected asset columns: {', '.join(missing_cols)}")
+    st.stop()
+
+if price_df[asset_cols].empty:
+    st.error("Downloaded price data is empty after filtering valid asset columns.")
+    st.stop()
+
 latest_prices = price_df[asset_cols].iloc[-1].values
 
 weights_input = render_weight_sliders(asset_cols)
