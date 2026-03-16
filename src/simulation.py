@@ -72,3 +72,20 @@ def simulate_portfolio_growth(
         "total_contributions": total_contributions,
         "pnl": pnl,
     }
+
+def compute_historical_portfolio_returns(returns_df: pd.DataFrame, asset_cols, weights: np.ndarray) -> np.ndarray:
+    asset_returns = returns_df[asset_cols].values
+    portfolio_returns = asset_returns @ weights
+    return portfolio_returns
+
+
+def compute_equal_weight_returns(returns_df: pd.DataFrame, asset_cols) -> np.ndarray:
+    n_assets = len(asset_cols)
+    equal_weights = np.ones(n_assets) / n_assets
+    asset_returns = returns_df[asset_cols].values
+    portfolio_returns = asset_returns @ equal_weights
+    return portfolio_returns
+
+
+def compute_cumulative_growth(returns: np.ndarray, initial_value: float = 1.0) -> np.ndarray:
+    return initial_value * np.cumprod(1 + returns)

@@ -1,0 +1,961 @@
+\documentclass[11pt]{report}
+
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage[hidelinks]{hyperref}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\usepackage{setspace}
+\usepackage{enumitem}
+\usepackage{parskip}
+
+\onehalfspacing
+
+\definecolor{accent}{RGB}{40,80,160}
+\definecolor{soft}{RGB}{240,245,255}
+
+\titleformat{\chapter}
+{\Huge\bfseries\color{accent}}
+{\thechapter}{20pt}{}
+
+\titleformat{\section}
+{\Large\bfseries}
+{\thesection}{12pt}{}
+
+\titleformat{\subsection}
+{\large\bfseries}
+{\thesubsection}{10pt}{}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{Portfolio Analytics Handbook}
+\fancyhead[R]{\thepage}
+
+\newtcolorbox{callout}{
+colback=soft,
+colframe=accent,
+boxrule=0.6pt,
+arc=4pt
+}
+
+\title{
+\Huge Portfolio Analytics Handbook\\
+\vspace{6pt}
+\Large Monte Carlo Portfolio Risk Simulator
+}
+
+\author{Portfolio Analytics Project}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\clearpage
+
+\tableofcontents
+\clearpage
+
+\chapter{Foundations}
+
+\section{Quick Start: How to Use This Simulator}
+\begin{callout}
+\textbf{Level.} Beginner
+\end{callout}
+
+This simulator helps you explore how a portfolio might behave under many possible future scenarios.
+
+\textbf{A practical workflow.}
+
+\begin{enumerate}
+\item Choose the assets you want in the portfolio.
+\item Set portfolio weights.
+\item Choose simulation settings such as time horizon and number of paths.
+\item Review the outputs:
+\end{enumerate}
+
+\begin{itemize}
+\item simulated portfolio paths
+\item return distribution
+\item terminal value distribution
+\item risk metrics
+\item optimization results
+\item historical backtesting
+\item factor analysis
+\item stress testing
+\item investment projections
+\end{itemize}
+
+This app does not predict one exact future.
+
+Instead, it builds many possible futures under a statistical model so you can study ranges, risks, and trade-offs.
+
+\section{What This App Does}
+\begin{callout}
+\textbf{Level.} Beginner
+\end{callout}
+
+\textbf{This dashboard combines several portfolio analytics tools in one place.}
+
+\begin{itemize}
+\item Monte Carlo simulation for future portfolio scenarios
+\item risk analysis using volatility, VaR, and CVaR
+\item portfolio optimization and efficient frontier analysis
+\item backtesting against historical data
+\item benchmark comparison
+\item CAPM-style market factor analysis
+\item stress testing under adverse assumptions
+\item long-term investment outcome projection
+\end{itemize}
+
+The goal is not only to compute numbers, but to help users understand what those numbers mean.
+
+\section{Glossary}
+\begin{callout}
+\textbf{Level.} Beginner
+\end{callout}
+
+\begin{description}[leftmargin=3.4cm, style=nextline, font=\normalfont\bfseries]
+\item[Portfolio] A collection of assets held together as one investment.
+\item[Weight] The proportion of the portfolio allocated to a particular asset.
+\item[Return] The percentage gain or loss over a period.
+\item[Expected Return] The model-based average return across scenarios.
+\item[Volatility] A measure of how much returns fluctuate.
+\item[Covariance] A measure of how two assets move together.
+\item[Correlation] A standardized version of co-movement between assets.
+\item[Monte Carlo Simulation] A method that generates many random future scenarios.
+\item[Benchmark] A reference portfolio or market index used for comparison, such as SPY.
+\item[VaR (Value at Risk)] A lower-tail threshold for losses.
+\item[CVaR (Conditional Value at Risk)] The average loss in the worst tail beyond VaR.
+\item[Sharpe Ratio] A measure of return relative to risk.
+\item[Beta] Sensitivity of a portfolio to market movements.
+\item[Alpha] Return not explained by market exposure alone.
+\item[R²] The fraction of portfolio return variation explained by the factor model.
+\item[Terminal Value] The ending portfolio value at the end of the simulation horizon.
+\item[Efficient Frontier] A set of portfolios representing attractive return-risk combinations under the model.
+\end{description}
+
+\section{Portfolio Basics}
+\begin{callout}
+\textbf{Level.} Beginner
+\end{callout}
+
+A portfolio is a weighted combination of assets such as stocks or ETFs.
+
+\begin{callout}
+\textbf{Example.}
+
+\begin{itemize}
+\item 50\% SPY
+\item 30\% QQQ
+\item 20\% NVDA
+\end{itemize}
+\end{callout}
+
+\textbf{Portfolio behavior depends on.}
+
+\begin{itemize}
+\item the expected return of each asset
+\item the volatility of each asset
+\item the correlation structure across assets
+\item the weights chosen by the investor
+\end{itemize}
+
+A strong portfolio is not simply a list of good assets.
+
+It is a design problem: how assets are combined matters just as much as which assets are selected.
+
+\section{Risk and Return}
+\begin{callout}
+\textbf{Level.} Beginner
+\end{callout}
+
+In investing, return and risk must be analyzed together.
+
+Return tells you how much a portfolio may grow.
+
+Risk tells you how uncertain, unstable, or fragile that growth may be.
+
+Two portfolios can have similar average returns but very different downside behavior.
+
+\begin{callout}
+\textbf{Example.}
+
+\begin{itemize}
+\item Portfolio A may grow more steadily with smaller drawdowns.
+\item Portfolio B may have higher upside but much deeper losses in weak scenarios.
+\end{itemize}
+\end{callout}
+
+\textbf{This simulator helps visualize both.}
+
+\begin{itemize}
+\item upside potential
+\item downside tail risk
+\item uncertainty of final outcomes
+\end{itemize}
+
+\section{Why Monte Carlo Simulation Is Useful}
+\begin{callout}
+\textbf{Level.} Beginner
+\end{callout}
+
+A single forecast is often misleading because markets are uncertain.
+
+Monte Carlo simulation addresses this by generating many possible future paths instead of only one path.
+
+\textbf{This helps answer questions such as.}
+
+\begin{itemize}
+\item What is the range of plausible outcomes?
+\item How often do poor outcomes occur?
+\item How severe are bad outcomes?
+\item How uncertain is final wealth?
+\end{itemize}
+
+This is especially useful in portfolio analysis because investors do not only care about the average case.
+
+They also care about tail risk, dispersion, and robustness.
+
+\section{How the Simulation Works in Plain English}
+\begin{callout}
+\textbf{Level.} Beginner
+\end{callout}
+
+\textbf{At a high level, the app works like this.}
+
+\begin{enumerate}
+\item It downloads historical price data.
+\item It converts prices into returns.
+\item It estimates statistical inputs such as expected return, volatility, and covariance.
+\item It generates many random future asset paths.
+\item It combines those simulated asset paths using your chosen portfolio weights.
+\item It summarizes the simulated outcomes using charts and metrics.
+\end{enumerate}
+
+\begin{callout}
+\textbf{Important.}
+
+This process is model-based.
+
+It is useful for scenario exploration, learning, and structured risk analysis.
+
+It is not a guarantee of future performance.
+\end{callout}
+
+\chapter{Reading the Outputs}
+
+\section{How to Read the Simulated Portfolio Paths Chart}
+\begin{callout}
+\textbf{Level.} Beginner
+\end{callout}
+
+This chart shows many possible portfolio trajectories over time.
+
+\textbf{How to interpret it.}
+
+\begin{itemize}
+\item each line represents one simulated future
+\item a narrow cloud suggests more stable outcomes
+\item a wide cloud suggests more uncertainty
+\item downward paths reveal possible drawdown scenarios
+\item upward paths illustrate upside potential
+\end{itemize}
+
+\textbf{What to look for.}
+
+\begin{itemize}
+\item the overall spread of paths
+\item whether severe downside scenarios appear
+\item whether growth appears steady or highly unstable
+\item whether uncertainty widens quickly as the horizon increases
+\end{itemize}
+
+\section{How to Read the Return Distribution}
+\begin{callout}
+\textbf{Level.} Beginner
+\end{callout}
+
+The return distribution summarizes simulated portfolio returns.
+
+\textbf{It helps you see.}
+
+\begin{itemize}
+\item the center of likely outcomes
+\item the spread of outcomes
+\item the downside tail
+\item the upside tail
+\end{itemize}
+
+\textbf{Interpretation.}
+
+\begin{itemize}
+\item a distribution shifted to the right suggests stronger expected performance
+\item a wider distribution suggests more uncertainty
+\item a heavy left tail suggests larger downside risk
+\item an asymmetric distribution may indicate uneven upside versus downside behavior
+\end{itemize}
+
+\section{How to Read the Terminal Value Distribution}
+\begin{callout}
+\textbf{Level.} Beginner
+\end{callout}
+
+The terminal value distribution focuses on ending wealth.
+
+\textbf{This is important because many investors care more about.}
+
+\begin{itemize}
+\item what their portfolio may be worth at the end
+\item how bad poor endings may be
+\item how wide the gap is between weak and strong scenarios
+\end{itemize}
+
+\textbf{Interpretation.}
+
+\begin{itemize}
+\item the middle mass shows typical outcomes
+\item the left tail shows poor endings
+\item the right tail shows strong upside scenarios
+\item a wide distribution means final wealth is highly uncertain
+\end{itemize}
+
+\section{Understanding Expected Return and Volatility}
+\begin{callout}
+\textbf{Level.} Intermediate depth
+\end{callout}
+
+Two of the most fundamental portfolio statistics are expected return and volatility.
+
+\textbf{Expected return.}
+
+\begin{equation}
+\mathbb{E}[R_p] = w^\top \mu
+\end{equation}
+
+\textbf{Volatility.}
+
+\begin{equation}
+\sigma_p = \sqrt{w^\top \Sigma w}
+\end{equation}
+
+\textbf{where.}
+
+\begin{itemize}
+\item $w$ is the portfolio weight vector
+\item $\mu$ is the expected return vector
+\item $\Sigma$ is the covariance matrix
+\end{itemize}
+
+\textbf{Interpretation.}
+
+\begin{itemize}
+\item higher expected return suggests stronger average modeled growth
+\item higher volatility means outcomes fluctuate more and are less predictable
+\end{itemize}
+
+A portfolio should not be judged by return alone.
+
+The return-risk trade-off is central.
+
+\section{Understanding VaR and CVaR}
+\begin{callout}
+\textbf{Level.} Intermediate depth
+\end{callout}
+
+Value at Risk (VaR) measures a downside threshold.
+
+\textbf{For return $R$ and confidence level $\textbackslash{}alpha$.}
+
+\begin{equation}
+\mathrm{VaR}_{\alpha}(R) = Q_{1-\alpha}(R)
+\end{equation}
+
+\begin{callout}
+\textbf{Example.}
+
+If 95\% VaR is -3\%, then only about 5\% of simulated outcomes are worse than -3\%.
+\end{callout}
+
+\textbf{Conditional Value at Risk (CVaR) goes further.}
+
+\begin{equation}
+\mathrm{CVaR}_{\alpha}(R) = \mathbb{E}[R \mid R \le \mathrm{VaR}_{\alpha}(R)]
+\end{equation}
+
+\textbf{Interpretation.}
+
+\begin{itemize}
+\item VaR gives the cutoff for bad outcomes
+\item CVaR gives the average severity once you are already in that bad tail
+\end{itemize}
+
+CVaR is often more informative because it captures tail depth, not only the threshold.
+
+\chapter{Methodology}
+
+\section{Portfolio Construction Mathematics}
+\begin{callout}
+\textbf{Level.} Technical
+\end{callout}
+
+\textbf{Let the portfolio weights be.}
+
+\begin{equation}
+w = (w_1, w_2, \dots, w_n)
+\end{equation}
+
+\textbf{For a fully invested portfolio.}
+
+\begin{equation}
+\sum_{i=1}^{n} w_i = 1
+\end{equation}
+
+\textbf{Portfolio return.}
+
+\begin{equation}
+R_p = \sum_{i=1}^{n} w_i R_i
+\end{equation}
+
+\textbf{Expected portfolio return.}
+
+\begin{equation}
+\mathbb{E}[R_p] = w^\top \mu
+\end{equation}
+
+\textbf{Portfolio variance.}
+
+\begin{equation}
+\mathrm{Var}(R_p) = w^\top \Sigma w
+\end{equation}
+
+These formulas form the mathematical foundation of portfolio analysis in the app.
+
+\textbf{Key insight.}
+
+Even if two assets are risky individually, combining them can reduce overall portfolio risk if their movements are not perfectly aligned.
+
+\section{Geometric Brownian Motion (GBM) Foundation}
+\begin{callout}
+\textbf{Level.} Technical
+\end{callout}
+
+\textbf{The simulator models asset prices using Geometric Brownian Motion (GBM).}
+
+\begin{equation}
+dS_t = \mu S_t \, dt + \sigma S_t \, dW_t
+\end{equation}
+
+\textbf{where.}
+
+\begin{itemize}
+\item $S_t$ is asset price at time $t$
+\item $\mu$ is drift
+\item $\sigma$ is volatility
+\item $W_t$ is Brownian motion
+\end{itemize}
+
+\textbf{A common discrete-time simulation form is.}
+
+\begin{equation}
+S_{t+\Delta t} = S_t \exp\left[
+\left(\mu - \frac{1}{2}\sigma^2\right)\Delta t
++ \sigma \sqrt{\Delta t} Z
+\right]
+\end{equation}
+
+\textbf{where.}
+
+\begin{itemize}
+\item $\Delta t$ is the time step
+\item $Z \sim N(0,1)$
+\end{itemize}
+
+\textbf{Why GBM is commonly used.}
+
+\begin{itemize}
+\item it keeps prices positive
+\item it is mathematically tractable
+\item it scales well for simulation
+\item it is a standard baseline model in finance
+\end{itemize}
+
+\textbf{Why it is imperfect.}
+
+\begin{itemize}
+\item it assumes constant parameters
+\item it may understate extreme events
+\item it does not capture all real market dynamics
+\end{itemize}
+
+\section{Parameter Estimation}
+\begin{callout}
+\textbf{Level.} Technical
+\end{callout}
+
+The simulator estimates model inputs from historical return data.
+
+\textbf{Typical estimated quantities.}
+
+\begin{itemize}
+\item expected return vector $\mu$
+\item volatility
+\item covariance matrix $\Sigma$
+\end{itemize}
+
+\textbf{These estimates drive.}
+
+\begin{itemize}
+\item simulation
+\item portfolio risk metrics
+\item optimization
+\item projection outputs
+\end{itemize}
+
+\textbf{Important caution.}
+
+Historical estimates are noisy.
+
+Future market behavior may differ from the past.
+
+\textbf{This means the app should be interpreted as.}
+
+\begin{itemize}
+\item a structured approximation
+\item a decision-support tool
+\item a learning framework
+\end{itemize}
+
+not as a certainty engine.
+
+\section{Monte Carlo Engine Logic}
+\begin{callout}
+\textbf{Level.} Technical
+\end{callout}
+
+Monte Carlo simulation generates many random future scenarios.
+
+\textbf{For each simulation path, the engine.}
+
+\begin{enumerate}
+\item draws random shocks
+\item propagates asset prices forward using the model
+\item computes portfolio values using the selected weights
+\item records path-level and terminal outcomes
+\end{enumerate}
+
+If there are $M$ simulated paths, the output is an empirical distribution across those $M$ scenarios.
+
+\textbf{This allows the app to estimate.}
+
+\begin{itemize}
+\item expected return
+\item volatility
+\item quantiles
+\item VaR and CVaR
+\item terminal wealth percentiles
+\item projection outcomes under repeated contributions
+\end{itemize}
+
+The power of Monte Carlo lies in studying the distribution of outcomes, not only a single expected value.
+
+\section{Portfolio Optimization}
+\begin{callout}
+\textbf{Level.} Intermediate depth
+\end{callout}
+
+Portfolio optimization studies how different allocations change the return-risk trade-off.
+
+\textbf{The app highlights common candidate portfolios such as.}
+
+\begin{itemize}
+\item current portfolio
+\item maximum Sharpe portfolio
+\item minimum volatility portfolio
+\end{itemize}
+
+\textbf{Sharpe ratio.}
+
+\begin{equation}
+\mathrm{Sharpe} = \frac{\mathbb{E}[R_p] - R_f}{\sigma_p}
+\end{equation}
+
+\textbf{where.}
+
+\begin{itemize}
+\item $\mathbb{E}[R_p]$ is expected portfolio return
+\item $R_f$ is the risk-free rate
+\item $\sigma_p$ is portfolio volatility
+\end{itemize}
+
+\textbf{Interpretation.}
+
+\begin{itemize}
+\item higher Sharpe suggests stronger risk-adjusted return
+\item minimum volatility focuses on stability
+\item your current portfolio may or may not be efficient relative to alternatives
+\end{itemize}
+
+Optimization does not reveal one universally correct portfolio.
+
+It reveals how assumptions and allocations shape the opportunity set.
+
+\section{How to Read the Efficient Frontier}
+\begin{callout}
+\textbf{Level.} Intermediate depth
+\end{callout}
+
+\textbf{The efficient frontier is the set of portfolios that offer.}
+
+\begin{itemize}
+\item the highest expected return for a given volatility, or
+\item the lowest volatility for a given expected return
+\end{itemize}
+
+\textbf{The app approximates this by generating many candidate portfolios and plotting.}
+
+\begin{itemize}
+\item x-axis: volatility
+\item y-axis: expected return
+\end{itemize}
+
+\textbf{Highlighted portfolios often include.}
+
+\begin{itemize}
+\item Current Portfolio
+\item Max Sharpe Portfolio
+\item Min Volatility Portfolio
+\end{itemize}
+
+\textbf{Interpretation.}
+
+\begin{itemize}
+\item points further left are lower risk
+\item points higher up are higher return
+\item points below attractive alternatives may be inefficient under the model assumptions
+\end{itemize}
+
+The frontier helps users compare design choices rather than focusing only on one allocation.
+
+\chapter{Validation and Extensions}
+
+\section{Historical Backtesting}
+\begin{callout}
+\textbf{Level.} Intermediate depth
+\end{callout}
+
+Backtesting applies the chosen portfolio weights to realized historical returns.
+
+\textbf{This helps answer.}
+
+\begin{itemize}
+\item how the portfolio would have behaved historically
+\item whether it outperformed or underperformed a benchmark
+\item whether historical performance was smooth or volatile
+\end{itemize}
+
+\textbf{A common cumulative growth representation is.}
+
+\begin{equation}
+V_t = \prod_{s=1}^{t} (1 + R_s)
+\end{equation}
+
+where $R_s$ is the portfolio return in period $s$.
+
+Backtesting is useful because it adds historical context.
+
+But it must not be confused with future certainty.
+
+A strategy that looked strong historically may still perform poorly going forward.
+
+\section{Benchmark Comparison}
+\begin{callout}
+\textbf{Level.} Beginner
+\end{callout}
+
+A benchmark provides context for performance.
+
+A portfolio gaining 8\% may sound good in isolation.
+
+But if a simple benchmark gained 15\% with similar or lower risk, the result looks less impressive.
+
+\textbf{Common reasons to compare against a benchmark.}
+
+\begin{itemize}
+\item evaluate active choices fairly
+\item determine whether complexity added value
+\item understand if performance is mostly just market exposure
+\end{itemize}
+
+A broad-market ETF such as SPY is often used as a reference benchmark.
+
+\section{CAPM / Market Factor Analysis}
+\begin{callout}
+\textbf{Level.} Technical
+\end{callout}
+
+\textbf{A simple market factor model is.}
+
+\begin{equation}
+R_p - R_f = \alpha + \beta (R_m - R_f) + \varepsilon
+\end{equation}
+
+\textbf{where.}
+
+\begin{itemize}
+\item $R_p$ is portfolio return
+\item $R_m$ is market return
+\item $R_f$ is risk-free rate
+\item $\alpha$ is alpha
+\item $\beta$ is beta
+\item $\varepsilon$ is the residual component
+\end{itemize}
+
+\textbf{Interpretation.}
+
+\begin{itemize}
+\item $\beta$ measures market sensitivity
+\item $\alpha$ measures return not explained by market exposure alone
+\item $R^2$ measures how much of return variation is explained by the model
+\end{itemize}
+
+\textbf{This helps distinguish between.}
+
+\begin{itemize}
+\item market-driven behavior
+\item portfolio-specific behavior
+\end{itemize}
+
+\section{How to Read the CAPM Scatter Plot}
+\begin{callout}
+\textbf{Level.} Intermediate depth
+\end{callout}
+
+Each point in the CAPM scatter plot represents one observation period.
+
+\textbf{Axes.}
+
+\begin{itemize}
+\item x-axis: market return
+\item y-axis: portfolio return
+\end{itemize}
+
+The fitted line summarizes the average relationship.
+
+\textbf{Interpretation.}
+
+\begin{itemize}
+\item steeper slope means higher beta
+\item tighter clustering around the line means higher R²
+\item wider scatter means more idiosyncratic behavior
+\item a positive intercept suggests positive alpha under the fitted model
+\end{itemize}
+
+This chart helps users understand whether the portfolio behaves mostly like the market or has distinct return dynamics.
+
+\section{Stress Testing}
+\begin{callout}
+\textbf{Level.} Intermediate depth
+\end{callout}
+
+Stress testing asks how the portfolio behaves under adverse assumptions.
+
+\textbf{Examples.}
+
+\begin{itemize}
+\item lower expected returns
+\item higher volatility
+\item market shock scenarios
+\item crash-style drawdowns
+\item worse-than-normal environments
+\end{itemize}
+
+\textbf{Why it matters.}
+
+A portfolio can appear strong in normal conditions but fail badly under stress.
+
+\textbf{Stress testing helps reveal.}
+
+\begin{itemize}
+\item fragility
+\item downside sensitivity
+\item robustness
+\item concentration risk
+\item dependence on favorable assumptions
+\end{itemize}
+
+\section{Investment Outcome Projections}
+\begin{callout}
+\textbf{Level.} Beginner
+\end{callout}
+
+This section translates portfolio return assumptions into practical long-term investing outcomes.
+
+\textbf{Typical inputs.}
+
+\begin{itemize}
+\item initial investment
+\item monthly contribution
+\item time horizon
+\end{itemize}
+
+\textbf{Typical outputs.}
+
+\begin{itemize}
+\item median final value
+\item mean final value
+\item pessimistic outcomes
+\item optimistic outcomes
+\item range of plausible final wealth
+\end{itemize}
+
+This makes the app more practical because investors often care about future wealth paths, not just abstract return distributions.
+
+\section{How to Interpret Projection Results}
+\begin{callout}
+\textbf{Level.} Beginner
+\end{callout}
+
+\textbf{Median Final Value.}
+
+The middle outcome. Half of simulations end above it and half below it.
+
+\textbf{Mean Final Value.}
+
+The average outcome. This can be pulled upward by a relatively small number of strong scenarios.
+
+\textbf{5th Percentile.}
+
+A pessimistic threshold representing weak outcomes.
+
+\textbf{95th Percentile.}
+
+An optimistic threshold representing strong outcomes.
+
+\textbf{Best practice.}
+
+\begin{itemize}
+\item use the median as a practical central case
+\item use low percentiles for risk planning
+\item use high percentiles to understand upside potential
+\end{itemize}
+
+\chapter{Cautions and Practice}
+
+\section{Common Portfolio Analysis Mistakes}
+\begin{callout}
+\textbf{Level.} Beginner
+\end{callout}
+
+\textbf{Common mistakes include.}
+
+\begin{itemize}
+\item focusing only on expected return
+\item ignoring downside tail risk
+\item treating historical averages as certainty
+\item overtrusting optimization output
+\item ignoring benchmark comparison
+\item forgetting concentration risk
+\item assuming a smooth chart means low real-world risk
+\item confusing model output with financial advice
+\end{itemize}
+
+\textbf{A better habit is to combine.}
+
+\begin{itemize}
+\item simulation
+\item risk metrics
+\item historical context
+\item stress testing
+\item judgment
+\end{itemize}
+
+\section{Model Assumptions and Limitations}
+\begin{callout}
+\textbf{Level.} Technical
+\end{callout}
+
+\textbf{Important limitations of this framework include.}
+
+\begin{itemize}
+\item GBM assumes constant drift and volatility
+\item correlations may change over time
+\item historical estimates can be unstable
+\item regime shifts are difficult to capture
+\item extreme events may be more severe than modeled
+\item transaction costs may be ignored
+\item taxes may be ignored
+\item rebalancing rules may not be fully modeled
+\item future market structure may differ from the estimation window
+\end{itemize}
+
+\textbf{Therefore, the simulator should be used as.}
+
+\begin{itemize}
+\item a learning tool
+\item a scenario engine
+\item a structured approximation
+\end{itemize}
+
+It should not be interpreted as certainty or personal financial advice.
+
+\section{FAQ}
+\begin{callout}
+\textbf{Level.} Beginner
+\end{callout}
+
+\begin{callout}
+\textbf{Q.} Does this app predict the future exactly?
+
+\textbf{A.} No. It generates many possible futures under model assumptions.
+\end{callout}
+
+\begin{callout}
+\textbf{Q.} Why do results change from run to run?
+
+\textbf{A.} Because random simulation is part of Monte Carlo analysis.
+\end{callout}
+
+\begin{callout}
+\textbf{Q.} Is higher expected return always better?
+
+\textbf{A.} No. Risk, dispersion, and tail behavior also matter.
+\end{callout}
+
+\begin{callout}
+\textbf{Q.} Why compare with SPY?
+
+\textbf{A.} It provides market context.
+\end{callout}
+
+\begin{callout}
+\textbf{Q.} Should I trust the max-Sharpe portfolio automatically?
+
+\textbf{A.} No. Optimization depends heavily on estimated inputs and assumptions.
+\end{callout}
+
+\begin{callout}
+\textbf{Q.} Why are VaR and CVaR useful?
+
+\textbf{A.} They summarize downside threshold and tail severity.
+\end{callout}
+
+\begin{callout}
+\textbf{Q.} Does strong backtest performance guarantee future success?
+
+\textbf{A.} No. Historical evidence is informative, but never a guarantee.
+\end{callout}
+
+\begin{callout}
+\textbf{Q.} Why can terminal wealth vary so much?
+
+\textbf{A.} Because compounding magnifies differences over time, especially under volatility.
+\end{callout}
+
+\end{document}

@@ -4,3 +4,6 @@ numpy
 plotly
 scipy
 yfinance
+reportlab>=4.0
+matplotlib>=3.8
+playwright

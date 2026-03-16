@@ -1,8 +1,9 @@
-import pandas as pd
-import plotly.express as px
 import streamlit as st
 
-from src.plotting import plot_projection_table_bars
+from src.plotting import (
+    plot_projection_table_bars,
+    plot_terminal_value_distribution,
+)
 from src.projections import build_projection_df
 
 
@@ -83,12 +84,10 @@ The **median final investment value** is **${investment_summary['median_final_va
     })
 
     st.caption("Quick summary of typical, downside, and upside projected profit/loss by investment horizon.")
-
     st.dataframe(display_df, width="stretch", hide_index=True)
 
     st.markdown("")
     st.markdown("### Projected Profit/Loss by Investment Horizon")
-
     st.plotly_chart(
         plot_projection_table_bars(projection_df),
         width="stretch"
@@ -96,22 +95,7 @@ The **median final investment value** is **${investment_summary['median_final_va
 
     st.markdown("")
     st.markdown("### Distribution of Simulated Final Values")
-
-    final_values_df = pd.DataFrame({
-        "Final Value": selected_final_values
-    })
-
-    fig_final_values = px.histogram(
-        final_values_df,
-        x="Final Value",
-        nbins=40,
-        title=None,
+    st.plotly_chart(
+        plot_terminal_value_distribution(selected_final_values),
+        width="stretch"
     )
-
-    fig_final_values.update_layout(
-        xaxis_title="Final Portfolio Value ($)",
-        yaxis_title="Frequency",
-        bargap=0.05,
-    )
-
-    st.plotly_chart(fig_final_values, width="stretch")
