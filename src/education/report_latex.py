@@ -234,7 +234,7 @@ def _glossary_body_to_latex(body: str) -> str:
     ]
     for term, definition in items:
         parts.append(
-            rf"\item[{_latex_escape(term)}] {_escape_text_preserving_inline_math(definition)}"
+            rf"\item[{_escape_text_preserving_inline_math(term)}] {_escape_text_preserving_inline_math(definition)}"
         )
     parts.append(r"\end{description}")
     return "\n".join(parts)
@@ -321,7 +321,8 @@ def _render_paragraph_block(block: str) -> str:
         return _render_enumerate(items)
 
     if len(lines) == 1 and lines[0].endswith(":"):
-        return r"\textbf{" + _latex_escape(lines[0][:-1]) + r".}"
+        label = _escape_text_preserving_inline_math(lines[0][:-1])
+        return r"\textbf{" + label + r".}"
 
     parts: list[str] = []
     i = 0
@@ -345,7 +346,8 @@ def _render_paragraph_block(block: str) -> str:
             continue
 
         if line.endswith(":"):
-            parts.append(r"\textbf{" + _latex_escape(line[:-1]) + r".}")
+            label = _escape_text_preserving_inline_math(line[:-1])
+            parts.append(r"\textbf{" + label + r".}")
         else:
             parts.append(_escape_text_preserving_inline_math(line))
         i += 1

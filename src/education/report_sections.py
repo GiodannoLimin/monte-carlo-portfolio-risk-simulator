@@ -10,7 +10,7 @@ A practical workflow:
 1. Choose the assets you want in the portfolio.
 2. Set portfolio weights.
 3. Choose simulation settings such as time horizon and number of paths.
-4. Review the outputs:
+4. Review the outputs.
    - simulated portfolio paths
    - return distribution
    - terminal value distribution
@@ -91,7 +91,7 @@ Sensitivity of a portfolio to market movements.
 Alpha:
 Return not explained by market exposure alone.
 
-R²:
+$R^2$:
 The fraction of portfolio return variation explained by the factor model.
 
 Terminal Value:
